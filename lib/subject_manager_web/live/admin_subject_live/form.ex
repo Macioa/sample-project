@@ -62,7 +62,7 @@ defmodule SubjectManagerWeb.AdminSubjectLive.Form do
     {:noreply, socket}
   end
 
-  def handle_event("upload", %{"upload" => %{"ref" => ref}}, socket) do
+  def handle_event("upload", %{"upload" => %{"ref" => _ref}}, socket) do
     {:noreply, socket}
   end
 

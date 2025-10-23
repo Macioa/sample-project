@@ -8,8 +8,36 @@ defmodule SubjectManagerWeb.AdminSubjectLive.Index do
       socket
       |> assign(page_title: "Admin - Subjects")
       |> assign(subjects: Subjects.list_subjects())
+      |> assign(form: to_form(%{}))
 
     {:ok, socket}
+  end
+
+  def handle_params(params, _url, socket) do
+    filter_params = %{
+      q: params["q"],
+      position: params["position"],
+      sort_by: params["sort_by"]
+    }
+
+    subjects = Subjects.list_subjects(filter_params)
+    form = to_form(Map.new(filter_params, fn {k, v} -> {to_string(k), v} end))
+
+    socket =
+      socket
+      |> assign(subjects: subjects)
+      |> assign(form: form)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("validate", params, socket) do
+    filter_params = params
+    |> Map.take(["q", "position", "sort_by"])
+    |> Enum.reject(fn {_k, v} -> v == nil or v == "" end)
+    |> Map.new()
+
+    {:noreply, push_patch(socket, to: ~p"/admin/subjects?#{filter_params}")}
   end
 
   def handle_event("delete", %{"id" => id}, socket) do
@@ -32,6 +60,10 @@ defmodule SubjectManagerWeb.AdminSubjectLive.Index do
         <.link navigate={~p"/admin/subjects/new"} class="button">
           Add New Subject
         </.link>
+      </div>
+
+      <div class="subject-index">
+        <.filter_form form={@form} />
       </div>
 
       <div class="bg-white shadow overflow-hidden sm:rounded-md">
@@ -63,6 +95,42 @@ defmodule SubjectManagerWeb.AdminSubjectLive.Index do
         </ul>
       </div>
     </div>
+    """
+  end
+
+  attr(:form, Phoenix.HTML.Form, required: true)
+
+  def filter_form(assigns) do
+    ~H"""
+    <.form for={@form} id="filter-form" phx-change="validate">
+      <.input field={@form[:q]} placeholder="Search..." autocomplete="off" />
+      <.input
+        type="select"
+        field={@form[:position]}
+        prompt="Position"
+        options={[
+          Forward: "forward",
+          Midfielder: "midfielder",
+          Winger: "winger",
+          Defender: "defender",
+          Goalkeeper: "goalkeeper"
+        ]}
+      />
+      <.input
+        type="select"
+        field={@form[:sort_by]}
+        prompt="Sort By"
+        options={[
+          Name: "name",
+          Team: "team",
+          Position: "position"
+        ]}
+      />
+
+      <.link patch={~p"/admin/subjects"}>
+        Reset
+      </.link>
+    </.form>
     """
   end
 end
