@@ -9,7 +9,11 @@ defmodule SubjectManagerWeb.AdminSubjectLive.Form do
       socket
       |> assign(page_title: "Admin - Subject Form")
       |> assign(subject: %Subject{})
-      |> allow_upload(:image, accept: ~w(.jpg .jpeg .png .gif), max_entries: 1, max_file_size: 1_000_000_000)
+      |> allow_upload(:image,
+        accept: ~w(.jpg .jpeg .png .gif),
+        max_entries: 1,
+        max_file_size: 1_000_000_000
+      )
 
     {:ok, socket}
   end
@@ -22,7 +26,11 @@ defmodule SubjectManagerWeb.AdminSubjectLive.Form do
       socket
       |> assign(subject: subject)
       |> assign(form: form)
-      |> allow_upload(:image, accept: ~w(.jpg .jpeg .png .gif), max_entries: 1, max_file_size: 1_000_000_000)
+      |> allow_upload(:image,
+        accept: ~w(.jpg .jpeg .png .gif),
+        max_entries: 1,
+        max_file_size: 1_000_000_000
+      )
 
     {:noreply, socket}
   end
@@ -34,7 +42,11 @@ defmodule SubjectManagerWeb.AdminSubjectLive.Form do
       socket
       |> assign(subject: %Subject{})
       |> assign(form: form)
-      |> allow_upload(:image, accept: ~w(.jpg .jpeg .png .gif), max_entries: 1, max_file_size: 1_000_000_000)
+      |> allow_upload(:image,
+        accept: ~w(.jpg .jpeg .png .gif),
+        max_entries: 1,
+        max_file_size: 1_000_000_000
+      )
 
     {:noreply, socket}
   end
@@ -67,20 +79,22 @@ defmodule SubjectManagerWeb.AdminSubjectLive.Form do
   end
 
   defp save_subject(socket, %Subject{} = subject, subject_params) do
-    uploaded_files = consume_uploaded_entries(socket, :image, fn %{path: path}, entry ->
-      filename = "#{System.unique_integer([:positive])}_#{entry.client_name}"
-      dest = Path.join([Application.app_dir(:subject_manager, "priv/static/images"), filename])
+    uploaded_files =
+      consume_uploaded_entries(socket, :image, fn %{path: path}, entry ->
+        filename = "#{System.unique_integer([:positive])}_#{entry.client_name}"
+        dest = Path.join([Application.app_dir(:subject_manager, "priv/static/images"), filename])
 
-      File.mkdir_p!(Path.dirname(dest))
-      File.cp!(path, dest)
+        File.mkdir_p!(Path.dirname(dest))
+        File.cp!(path, dest)
 
-      {:ok, "/images/#{filename}"}
-    end)
+        {:ok, "/images/#{filename}"}
+      end)
 
-    image_path = case uploaded_files do
-      [image_path] -> image_path
-      [] -> subject_params["image_path"] || subject.image_path || "/images/placeholder.jpg"
-    end
+    image_path =
+      case uploaded_files do
+        [image_path] -> image_path
+        [] -> subject_params["image_path"] || subject.image_path || "/images/placeholder.jpg"
+      end
 
     updated_params = Map.put(subject_params, "image_path", image_path)
 

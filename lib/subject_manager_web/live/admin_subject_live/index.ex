@@ -32,10 +32,11 @@ defmodule SubjectManagerWeb.AdminSubjectLive.Index do
   end
 
   def handle_event("validate", params, socket) do
-    filter_params = params
-    |> Map.take(["q", "position", "sort_by"])
-    |> Enum.reject(fn {_k, v} -> v == nil or v == "" end)
-    |> Map.new()
+    filter_params =
+      params
+      |> Map.take(["q", "position", "sort_by"])
+      |> Enum.reject(fn {_k, v} -> v == nil or v == "" end)
+      |> Map.new()
 
     {:noreply, push_patch(socket, to: ~p"/admin/subjects?#{filter_params}")}
   end
