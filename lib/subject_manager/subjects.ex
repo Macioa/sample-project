@@ -9,7 +9,7 @@ defmodule SubjectManager.Subjects do
 
   def list_subjects(params) do
     Subject
-    # |> filter_by_name(params[:q])
+    |> filter_by_name(params[:q])
     |> filter_by_position(params[:position])
     |> sort_by_field(params[:sort_by])
     |> Repo.all()
@@ -17,6 +17,9 @@ defmodule SubjectManager.Subjects do
 
   defp filter_by_name(query, nil), do: query
   defp filter_by_name(query, ""), do: query
+  defp filter_by_name(query, name) do
+    where(query, [s], like(s.name, ^"%#{name}%"))
+  end
 
   defp filter_by_position(query, nil), do: query
   defp filter_by_position(query, ""), do: query
