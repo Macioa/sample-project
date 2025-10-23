@@ -14,6 +14,33 @@ defmodule SubjectManagerWeb.SubjectLive.Index do
     {:ok, socket}
   end
 
+  def handle_params(params, _url, socket) do
+    filter_params = %{
+      q: params["q"],
+      position: params["position"],
+      sort_by: params["sort_by"]
+    }
+
+    subjects = Subjects.list_subjects(filter_params)
+    form = to_form(Map.new(filter_params, fn {k, v} -> {to_string(k), v} end))
+
+    socket =
+      socket
+      |> assign(subjects: subjects)
+      |> assign(form: form)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("validate", params, socket) do
+    filter_params = params
+    |> Map.take(["q", "position", "sort_by"])
+    |> Enum.reject(fn {_k, v} -> v == nil or v == "" end)
+    |> Map.new()
+
+    {:noreply, push_patch(socket, to: ~p"/subjects?#{filter_params}")}
+  end
+
   def render(assigns) do
     ~H"""
     <div class="subject-index">
@@ -53,7 +80,7 @@ defmodule SubjectManagerWeb.SubjectLive.Index do
 
   def filter_form(assigns) do
     ~H"""
-    <.form for={@form} id="filter-form">
+    <.form for={@form} id="filter-form" phx-change="validate">
       <.input field={@form[:q]} placeholder="Search..." autocomplete="off" />
       <.input
         type="select"
