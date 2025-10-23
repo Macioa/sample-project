@@ -6,17 +6,18 @@ services:
     ports:
       - "4000:4000"
     volumes:
-      # Mount source code for live reloading
-      - .:/app
+      # Mount source code for live reloading (cached for better macOS performance)
+      - .:/app:cached
       # Mount database file to persist data
       - ./subject_manager_dev.db:/app/subject_manager_dev.db
-      # Mount node_modules to avoid conflicts
-      - /app/node_modules
-      - /app/deps
+      # Exclude build artifacts and dependencies to avoid conflicts
       - /app/_build
+      - /app/deps
+      - /app/node_modules
     environment:
       - MIX_ENV=docker
-      - PHX_HOST=localhost
+      - PHX_HOST=0.0.0.0
+      - PHX_PORT=4000
     command: >
       sh -c "
         mix deps.get &&
