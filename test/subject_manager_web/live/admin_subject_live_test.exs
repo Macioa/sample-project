@@ -30,6 +30,7 @@ defmodule SubjectManagerWeb.AdminSubjectLiveTest do
     assert has_element?(view, "input[name=\"subject[team]\"]")
     assert has_element?(view, "select[name=\"subject[position]\"]")
     assert has_element?(view, "textarea[name=\"subject[bio]\"]")
+    assert has_element?(view, "input[type=\"file\"]")
   end
 
   test "admin form page loads for editing existing subject", %{conn: conn} do
