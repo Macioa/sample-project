@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  subject-manager:
+    build: .
+    ports:
+      - "4000:4000"
+    volumes:
+      # Mount source code for live reloading (cached for better macOS performance)
+      - .:/app:cached
+      # Mount database file to persist data
+      - ./subject_manager_dev.db:/app/subject_manager_dev.db
+      # Exclude build artifacts and dependencies to avoid conflicts
+      - /app/_build
+      - /app/deps
+      - /app/node_modules
+    environment:
+      - MIX_ENV=docker
+      - PHX_HOST=0.0.0.0
+      - PHX_PORT=4000
+    command: >
+      sh -c "
+        mix deps.get &&
+        mix ecto.setup &&
+        mix phx.server
+      "
+    stdin_open: true
+    tty: true
+    networks:
+      - subject-manager-network
+
+networks:
+  subject-manager-network:
+    driver: bridge
