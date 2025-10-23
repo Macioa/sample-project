@@ -19,6 +19,7 @@ defmodule SubjectManagerWeb.Router do
 
     live("/", SubjectLive.Index)
     live("/subjects", SubjectLive.Index)
+    live("/subjects/:id", SubjectLive.Show)
   end
 
   # Other scopes may use custom stacks.

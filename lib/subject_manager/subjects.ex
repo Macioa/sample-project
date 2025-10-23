@@ -15,6 +15,8 @@ defmodule SubjectManager.Subjects do
     |> Repo.all()
   end
 
+  def get_subject!(id), do: Repo.get!(Subject, id)
+
   defp filter_by_name(query, nil), do: query
   defp filter_by_name(query, ""), do: query
   defp filter_by_name(query, name) do
