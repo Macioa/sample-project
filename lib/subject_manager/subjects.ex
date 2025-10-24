@@ -17,6 +17,22 @@ defmodule SubjectManager.Subjects do
 
   def get_subject!(id), do: Repo.get!(Subject, id)
 
+  def create_subject(attrs \\ %{}) do
+    %Subject{}
+    |> Subject.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def update_subject(%Subject{} = subject, attrs) do
+    subject
+    |> Subject.changeset(attrs)
+    |> Repo.update()
+  end
+
+  def delete_subject(%Subject{} = subject) do
+    Repo.delete(subject)
+  end
+
   defp filter_by_name(query, nil), do: query
   defp filter_by_name(query, ""), do: query
   defp filter_by_name(query, name) do
